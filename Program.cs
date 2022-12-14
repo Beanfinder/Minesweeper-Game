@@ -1,9 +1,8 @@
-﻿using System;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
 
-namespace minesweeperclone
+namespace minesweeper
 {
     class Program
     {

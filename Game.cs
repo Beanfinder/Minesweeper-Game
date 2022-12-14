@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using SFML.Graphics;
-using SFML.Window;
 using SFML.System;
-using System.Collections;
 
-namespace minesweeperclone
+
+namespace minesweeper
 {
     class Box
     {
@@ -41,7 +40,7 @@ namespace minesweeperclone
     class Game
     {
         Sprite board;
-        Texture texture;
+         Texture texture;
 
         Dictionary<Vector2f, Box> boxes;
 
@@ -53,14 +52,14 @@ namespace minesweeperclone
         public bool NotFirst {get; set;}
         public bool EnabledClick {get; set;}
 
-        int flagCounter = 0;
-        int LIMIT_FLAGS = 80;
+        int totalFlags = 0;
+        int flagLimit = 80;
         
         Sprite gameOver;
         Sprite youWon;
 
-        bool isWon;
-        bool isLose;
+        bool won;
+        bool lost;
 
         public Game()
         {
@@ -88,7 +87,7 @@ namespace minesweeperclone
             youWon.Position = new Vector2f(0, 160 - 25);
         }
 
-        public void GenerateMines()
+        public void randomMines()
         {   
             int limit = 0;
             int rowLimit = 0;
@@ -107,7 +106,6 @@ namespace minesweeperclone
                             limit++;
                             boxes[new Vector2f(x, y)].bomb = true;
                             boxes[new Vector2f(x, y)].type = 0;
-                            // boxes[new Vector2f(x, y)].uiBox.TextureRect = new IntRect(boxes[new Vector2f(x, y)].type * 10, 0, 10, 10);
                         }
                     }
                 }
@@ -268,14 +266,14 @@ namespace minesweeperclone
                         if(box.Value.bomb)
                         {
                             ShowAllMines();
-                            isLose = true;
+                            lost = true;
                             box.Value.type = 10;
                             EnabledClick = false;
                         }
 
                         if(!NotFirst)
                         {
-                            GenerateMines();
+                            randomMines();
                             CalculateNumbers();
                             NotFirst = true;
                         }
@@ -288,7 +286,7 @@ namespace minesweeperclone
                     }
 
                     // set flag
-                    if(RightClick && box.Value.rect.Contains((int)mouseCoords.X, (int)mouseCoords.Y) && flagCounter < LIMIT_FLAGS)
+                    if(RightClick && box.Value.rect.Contains((int)mouseCoords.X, (int)mouseCoords.Y) && totalFlags < flagLimit)
                     {
                         RightClick = false;
 
@@ -296,19 +294,19 @@ namespace minesweeperclone
                         {
                             box.Value.flagged = true;
                             box.Value.uiBox.TextureRect = new IntRect(11 * 10,0,10,10);
-                            flagCounter++;
+                            totalFlags++;
                         }
                         else if(box.Value.flagged && !box.Value.opened)
                         {
                             box.Value.flagged = false;
                             box.Value.uiBox.TextureRect = new IntRect(0 * 10,0,10,10);
-                            flagCounter--;
+                            totalFlags--;
                         }
 
 
                         if(NotFirst && CheckMines())
                         {
-                            isWon = true;
+                            won = true;
                             EnabledClick = false;
                         }
                     }
@@ -329,11 +327,11 @@ namespace minesweeperclone
                 }
             }
 
-            if(isLose)
+            if(lost)
             {
                 renderTexture.Draw(gameOver);
             }
-            if(isWon)
+            if(won)
             {
                 renderTexture.Draw(youWon);
             }
